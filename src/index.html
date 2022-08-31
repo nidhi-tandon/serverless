@@ -69,17 +69,38 @@
 </template>
 
 
-
 <script>
-    async function initialize(){
-        const movies = await fetch('/.netlify/functions/movies').then((res)=>{
+
+    function addScores(element, scores) {
+        if (scores) {
+            scores.forEach((score) => {
+                const item = document.createElement('li');
+                const label = document.createElement('span');
+                label.classList.add('source');
+
+                label.innerText = score.Source === 'Internet Movie Database' ? 'IMDb' : score.Source;
+                item.appendChild(label);
+
+                const value = document.createElement('span');
+                value.innerText = score.Value;
+                item.appendChild(value);
+
+                const scoreElement = element.querySelector('.scores');
+                scoreElement.appendChild(item);
+            })
+        }
+    }
+
+
+    async function initialize() {
+        const movies = await fetch('/.netlify/functions/movies').then((res) => {
             return res.json();
         })
 
         const container = document.querySelector('.movies');
         const template = document.querySelector('#movie-template');
 
-        movies.forEach((movie)=>{
+        movies.forEach((movie) => {
             const element = template.content.cloneNode(true);
             const img = element.querySelector('img');
             img.src = movie.poster;
@@ -88,8 +109,11 @@
             element.querySelector('h2').innerText = movie.title;
             element.querySelector('p').innerText = movie.tagline;
 
+            addScores(element, movie.scores)
+
             container.appendChild(element);
         })
     }
+
     initialize();
 </script>
